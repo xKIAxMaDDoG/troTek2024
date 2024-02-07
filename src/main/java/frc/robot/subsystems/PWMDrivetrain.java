@@ -8,9 +8,9 @@ import static frc.robot.Constants.DrivetrainConstants.*;
 
 import edu.wpi.first.wpilibj.drive.DifferentialDrive;
 import edu.wpi.first.wpilibj.motorcontrol.MotorControllerGroup;
-import edu.wpi.first.wpilibj.motorcontrol.PWMSparkMax;
+import edu.wpi.first.wpilibj.motorcontrol.Spark;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
-
+import edu.wpi.first.wpilibj.motorcontrol.Spark;
 /* This class declares the subsystem for the robot drivetrain if controllers are connected via PWM. If using SPARK MAX
  * controllers connected to CAN, go to RobotContainer and comment out the line declaring this subsystem and uncomment
  * the line for the CANDrivetrain.
@@ -32,9 +32,9 @@ public class PWMDrivetrain extends SubsystemBase {
      * as we will not need to reference them directly anymore after we put them into a DifferentialDrive.
      */
     MotorControllerGroup leftMotors =
-        new MotorControllerGroup(new PWMSparkMax(kLeftFrontID), new PWMSparkMax(kLeftRearID));
+        new MotorControllerGroup(new Spark(kLeftFrontID), new Spark(kLeftRearID));
     MotorControllerGroup rightMotors =
-        new MotorControllerGroup(new PWMSparkMax(kRightFrontID), new PWMSparkMax(kRightRearID));
+        new MotorControllerGroup(new Spark(kRightFrontID), new Spark(kRightRearID));
 
     // Invert left side motors so both sides drive forward with positive output values
     leftMotors.setInverted(true);
