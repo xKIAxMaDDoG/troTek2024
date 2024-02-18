@@ -28,27 +28,60 @@ public class PWMDrivetrain extends SubsystemBase {
    * member variables and perform any configuration or set up necessary on hardware.
    */
   public PWMDrivetrain() {
+    
+    //Creates Motor Controllers using PWM Spark motor controllers.
+    Spark leftFront = new Spark(kLeftFrontID);
+    Spark leftRear = new Spark(kLeftRearID);
+    Spark rightFront = new Spark(kRightFrontID);
+    Spark rightRear = new Spark(kRightRearID);
+
     /*Create MotorControllerGroups for each side of the drivetrain. These are declared here, and not at the class level
      * as we will not need to reference them directly anymore after we put them into a DifferentialDrive.
      */
     MotorControllerGroup leftMotors =
-        new MotorControllerGroup(new Spark(kLeftFrontID), new Spark(kLeftRearID));
+        new MotorControllerGroup(leftFront, leftRear);
     MotorControllerGroup rightMotors =
-        new MotorControllerGroup(new Spark(kRightFrontID), new Spark(kRightRearID));
+        new MotorControllerGroup(rightFront, rightRear);
 
     // Invert left side motors so both sides drive forward with positive output values
     leftMotors.setInverted(true);
     rightMotors.setInverted(false);
 
+    // Disable motor safety
+    leftFront.setExpiration(2);
+    leftRear.setExpiration(2);
+    rightFront.setExpiration(2);
+    rightRear.setExpiration(2);
+
+    leftFront.feed();
+    leftRear.feed();
+    rightFront.feed();
+    rightRear.feed();
+
     // Put our controller groups into a DifferentialDrive object. This object represents all 4 motor
     // controllers in the drivetrain
     m_drivetrain = new DifferentialDrive(leftMotors, rightMotors);
   }
-
+  
   /*Method to control the drivetrain using arcade drive. Arcade drive takes a speed in the X (forward/back) direction
    * and a rotation about the Z (turning the robot about it's center) and uses these to control the drivetrain motors */
   public void arcadeDrive(double speed, double rotation) {
     m_drivetrain.arcadeDrive(speed, rotation);
+    m_drivetrain.feed();
+  }
+
+  //Creates tank drive for utility.
+  public void tankDrive(double left, double right){
+    m_drivetrain.tankDrive(left, right);
+    m_drivetrain.feed();
+  };
+
+  public void stop(){
+    m_drivetrain.tankDrive(0, 0);
+  }
+
+  public void curvatureDrive(double speed, double rotation, boolean quickturn){
+    m_drivetrain.curvatureDrive(speed*.75, -rotation, quickturn);
   }
 
   @Override

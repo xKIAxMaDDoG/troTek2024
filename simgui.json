@@ -4,15 +4,29 @@
       "Victor SPX[1]": {
         "header": {
           "open": true
-        }
+        },
+        "name": "Shooter Motor"
       },
       "Victor SPX[2]": {
         "header": {
           "open": true
-        }
+        },
+        "name": "Feeder Motor"
       }
     },
     "PWM Outputs": {
+      "0": {
+        "name": "RightFront"
+      },
+      "1": {
+        "name": "RightRear"
+      },
+      "2": {
+        "name": "LeftFront"
+      },
+      "3": {
+        "name": "LeftRear"
+      },
       "window": {
         "visible": true
       }
@@ -50,6 +64,18 @@
     }
   },
   "NetworkTables Info": {
+    "Server": {
+      "Subscribers": {
+        "open": true
+      },
+      "open": true
+    },
     "visible": true
+  },
+  "sourceNames": {
+    "PWM[0]": "RightFront",
+    "PWM[1]": "RightRear",
+    "PWM[2]": "LeftFront",
+    "PWM[3]": "LeftRear"
   }
 }

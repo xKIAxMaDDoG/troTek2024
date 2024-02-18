@@ -4,15 +4,21 @@
 
 package frc.robot;
 
+import com.kauailabs.navx.frc.AHRS;
+
+import edu.wpi.first.wpilibj.SPI;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.RunCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
+import frc.robot.Constants.DrivetrainConstants;
 import frc.robot.Constants.LauncherConstants;
 import frc.robot.Constants.OperatorConstants;
 import frc.robot.commands.Autos;
 import frc.robot.commands.LaunchNote;
 import frc.robot.commands.PrepareLaunch;
+import frc.robot.commands.rotateDriveTrain;
 import frc.robot.subsystems.PWMDrivetrain;
+import frc.robot.navX;
 //import frc.robot.subsystems.PWMLauncher;
 
 // import frc.robot.subsystems.CANDrivetrain;
@@ -31,6 +37,7 @@ public class RobotContainer {
   // private final PWMLauncher m_launcher = new PWMLauncher();
   private final CANLauncher m_launcher = new CANLauncher();
 
+  
   /*The gamepad provided in the KOP shows up like an XBox controller if the mode switch is set to X mode using the
    * switch on the top.*/
   private final CommandXboxController m_driverController =
@@ -38,11 +45,15 @@ public class RobotContainer {
   private final CommandXboxController m_operatorController =
       new CommandXboxController(OperatorConstants.kOperatorControllerPort);
 
+      
   /** The container for the robot. Contains subsystems, OI devices, and commands. */
   public RobotContainer() {
     // Configure the trigger bindings
     configureBindings();
   }
+  double speed;
+  double rotation;
+  boolean quickTurn;
 
   /**
    * Use this method to define your trigger->command mappings. Triggers can be accessed via the
@@ -54,9 +65,17 @@ public class RobotContainer {
     m_drivetrain.setDefaultCommand(
         new RunCommand(
             () ->
-                m_drivetrain.arcadeDrive(
-                    -m_driverController.getLeftY(), -m_driverController.getRightX()),
-            m_drivetrain));
+                /*
+                This configures the Lambda Expression for curvatureDrive instead of arcadeDrive. To use Arcase Drive, 
+                comment the next 3 lines out and remove the comment bars for the 3 lines after that.
+                */
+            m_drivetrain.curvatureDrive(
+                        m_driverController.getRawAxis(3) - m_driverController.getRawAxis(2), m_driverController.getRawAxis(0), speed > -0.2 && speed < 0.2), 
+              m_drivetrain     
+            //m_drivetrain.arcadeDrive(
+            //        -m_driverController.getLeftY(), -m_driverController.getRightX()),
+            //m_drivetrain
+    ));
 
     /*Create an inline sequence to run when the operator presses and holds the A (green) button. Run the PrepareLaunch
      * command for 1 seconds and then run the LaunchNote command */
@@ -64,9 +83,21 @@ public class RobotContainer {
         .a()
         .whileTrue(
             new PrepareLaunch(m_launcher)
+                .alongWith(new rotateDriveTrain(m_drivetrain))
                 .withTimeout(LauncherConstants.kLauncherDelay)
                 .andThen(new LaunchNote(m_launcher))
                 .handleInterrupt(() -> m_launcher.stop()));
+
+    //Force Launch No Rotate
+    m_driverController
+        .b()
+        .whileTrue(
+            new PrepareLaunch(m_launcher)
+                .withTimeout(LauncherConstants.kLauncherDelay)
+                .andThen(new LaunchNote(m_launcher))
+                .handleInterrupt(() -> m_launcher.stop()));
+
+        
 
     // Set up a binding to run the intake command while the operator is pressing and holding the
     // left Bumper
